@@ -18,7 +18,6 @@ def get_data(stock_name, start_date, end_date):
     code = name[name['종목명'] == stock_name]['종목코드']
     code =  'A'+str(code).zfill(6)
     final_df = df[df['name'] == stock_name]
-
     return final_df
 
 
