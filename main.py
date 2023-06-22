@@ -1,18 +1,49 @@
 # from fastapi import FastAPI
 # import torch
+import requests
+import json
 
 
-# app = FastAPI()
+URL =  'http://localhost:8080/2015-03-31/functions/function/invocations'
 
-# # PyTorch Lightning 체크포인트 파일 경로
-# ckpt_path = "path/to/your/checkpoint.ckpt"
 
-# # # PyTorch Lightning 모델 로드
-# # model = YourModel.load_from_checkpoint(ckpt_path)
+sample_json = {
+  "time_series": [
+    {
+      "open": 2,
+      "high": 0,
+      "low": 0,
+      "close": 0,
+      "vol": 0,
+      "value": 0,
+      "agg_price": 0,
+      "foreign_rate": 0,
+      "agency_buy": 0,
+      "agency_netbuy": 0
+    },
+		{
+      "open": 1,
+      "high": 0,
+      "low": 0,
+      "close": 0,
+      "vol": 0,
+      "value": 0,
+      "agg_price": 0,
+      "foreign_rate": 0,
+      "agency_buy": 0,
+      "agency_netbuy": 0
+    }
+  ]
+}
 
-# # @app.get("/")
-# # async def read_root():
-# #     # 모델 사용 예시
-# #     input_tensor = torch.randn(1, 3, 224, 224)
-# #     output = model(input_tensor)
-# #     return {"prediction": output.tolist()}
+response = requests.post(url= URL, json= sample_json)
+body = response.json()['body']
+prediction = json.loads(body)['prediction']
+
+print(prediction)
+
+# body = json.loads(response.json()['body'])
+
+# # prediction 값을 추출
+# prediction = json.loads(body['prediction'])
+# print(prediction)
