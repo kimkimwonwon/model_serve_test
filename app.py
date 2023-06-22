@@ -6,6 +6,39 @@ from modules.vizualization import *
 from modules.st_initial import *
 import datetime
 import time
+import requests
+import json
+import numpy as np
+
+
+
+def count_outliers(lst):
+    mean = np.mean(lst)
+    std = np.std(lst)
+    
+    lower_bound = mean - 2 * std
+    upper_bound = mean + 2 * std
+    
+    outliers = [x for x in lst if x < lower_bound or x > upper_bound]
+    num_outliers = len(outliers)
+    
+    return num_outliers
+
+def standard_scale(lst):
+    # 리스트를 numpy 배열로 변환
+    arr = np.array(lst)
+    
+    # 평균과 표준 편차 계산
+    mean = np.mean(arr)
+    std = np.std(arr)
+    
+    # 표준화 수식 적용
+    scaled_arr = (arr - mean) / std
+    
+    # 표준화된 배열 반환
+    return scaled_arr.tolist()
+
+
 
 st.set_page_config(layout="wide")
 # 화면분할
@@ -14,7 +47,7 @@ initialize()
 
 st.image('imgs/market_early_logo.png', width = 100 )
 
-main_page ,Modeling ,Infra ,  Role ,source_code =  st.tabs(['🌟 Main Page 🌟' , '🤖 Modeling 🤖', 'Model Serving',  'R&R', 'Source_Code'])
+main_page ,Modeling  ,  Role ,source_code =  st.tabs(['🌟 Main Page 🌟' , '🤖 Modeling 🤖',  'R&R', 'Source_Code'])
 
 #  ---------   --------- 
 
@@ -40,6 +73,7 @@ with main_page:
 
 if search_button:
     df =  get_data(st.session_state.stock_name, start_date, end_date)
+    st.session_state.df  = df 
     #st.table(df)
     chart = draw_chart(df)
     main_page.plotly_chart(chart)
@@ -59,11 +93,58 @@ if predict_start :
             time.sleep(3)
         main_page.success('Done!')
 
+        df =  get_data(st.session_state.stock_name, start_date, end_date)
 
-        # 모델링 
-        # chart = px.line()
-        # main1.st.plotlychart()
-        main1.metric("hi" , " hello 117% " , "your stock is in danger" )
+        column_names = ['open', 'high', 'low', 'close', 'vol', 'value', 'agg_price', 'foreign_rate', 'agency_buy', 'agency_netbuy']
+        tmp_df = df[column_names]
+        tail_df = tmp_df[-15:]
+
+        time_series = []
+        for _, row in tail_df.iterrows():
+            time_series.append({
+                "high": row['high'],
+                "open": row['open'],
+                "low": row['low'],
+                "close": row['close'],
+                "vol": row['vol'],
+                "value": row['value'],
+                "agg_price": row['agg_price'],
+                "foreign_rate": row['foreign_rate'],
+                "agency_buy": row['agency_buy'],
+                "agency_netbuy": row['agency_netbuy']
+            })
+
+        sample_json = {
+            "time_series" : time_series,
+            # "stock_name" : "삼성전자"
+        }
+
+
+        # AutoEncoder 
+        URL =  'http://localhost:8080/2015-03-31/functions/function/invocations'
+        response = requests.post(url= URL, json= sample_json)
+        body = response.json()['body']
+        prediction = json.loads(body)['prediction']
+
+        num_outlier = count_outliers(prediction)
+        scaled_prediction = standard_scale(prediction)
+
+        scaled_prediction_df = pd.DataFrame({'value': scaled_prediction})
+        fig = px.histogram(scaled_prediction_df, x='value', nbins=20)
+
+        fig.update_layout(
+            title="Standardized Reconstructed Error Histogram",
+            xaxis_title="Value",
+            yaxis_title="Frequency",
+            bargap=0.1
+
+        )
+
+        main_page.plotly_chart(fig)
+        main_page.write(f"Number of outliers: {num_outlier}")
+
+
+        main1.metric("hi" , f" hello 117% " , "your stock is in danger" )
         main2.metric("hellow !!!  " , " hello 117% " , "your stock is in danger", delta_color ="inverse")
 
 
@@ -76,12 +157,9 @@ with source_code:
 
 
 
-
-
-
 with Modeling:
     #modeling.title("Model Architecture 🤖")
-    modeling_col1, modeling_col2 = st.columns([0.6,0.4])
+    modeling_col1, modeling_col2 = st.columns([1,1])
     modeling_col1.title("Data Pipeline")
     modeling_col1.image('imgs/DataPipeline.png')
     modeling_col2.title("Model Architecture")
@@ -90,5 +168,7 @@ with Modeling:
 
 with Role:
     Role.title("Role 🤝")
+    Role.image('imgs/randr.png')
+    
     
 
