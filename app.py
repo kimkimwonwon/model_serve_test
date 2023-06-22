@@ -12,6 +12,8 @@ st.set_page_config(layout="wide")
 # session_state 초기화
 initialize()
 
+st.image('imgs/market_early_logo.png', width = 100 )
+
 main_page ,Modeling ,Infra ,  Role ,source_code =  st.tabs(['🌟 Main Page 🌟' , '🤖 Modeling 🤖', 'Model Serving',  'R&R', 'Source_Code'])
 
 #  ---------   --------- 
