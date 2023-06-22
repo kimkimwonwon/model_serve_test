@@ -12,7 +12,7 @@ st.set_page_config(layout="wide")
 # session_state 초기화
 initialize()
 
-main_page, source_code , modeling  =  st.tabs(['Main Page' , 'Source_Code' , 'Modeling'])
+main_page ,Modeling ,Infra ,  Role ,source_code =  st.tabs(['🌟 Main Page 🌟' , '🤖 Modeling 🤖', 'Model Serving',  'R&R', 'Source_Code'])
 
 #  ---------   --------- 
 
@@ -21,11 +21,11 @@ main_page.title("YBIGTA 2023-1 Conference 😎")
 st.sidebar.title("Market Early 📈")
 st.sidebar.text_input(label="Search Stock", value="AAPL🍎",key="stock_name")
 search_button = st.sidebar.button('Search')
-start_date = st.sidebar.date_input("Start Date", value=datetime.date(2021, 1, 1))
-end_date = st.sidebar.date_input("End Date", value=datetime.date(2021, 1, 31))
+start_date = st.sidebar.date_input("Start Date", value=datetime.date(2022, 5, 20))
+end_date = st.sidebar.date_input("End Date", value=datetime.date(2023, 5, 20))
 st.sidebar.radio("Day or Minutes", ["Day", "Minutes"],key='day_or_minutes')
 
-predict_start = st.sidebar.button('Predict Start')
+predict_start = st.sidebar.button('Predict Start 🔍')
 
 # UI_sidebar
 
@@ -52,17 +52,17 @@ if search_button:
 
 
 if predict_start :
+    if st.  session_state.stock_name != '':
+        with st.spinner('Wait for it...'):
+            time.sleep(3)
+        main_page.success('Done!')
 
-    with st.spinner('Wait for it...'):
-        time.sleep(3)
-    main1.success('Done!')
 
-
-    # 모델링 
-    # chart = px.line()
-    # main1.st.plotlychart()
-    main1.metric("hi" , " hello 117% " , "your stock is in danger" )
-    main2.metric("hellow !!!  " , " hello 117% " , "your stock is in danger", delta_color ="inverse")
+        # 모델링 
+        # chart = px.line()
+        # main1.st.plotlychart()
+        main1.metric("hi" , " hello 117% " , "your stock is in danger" )
+        main2.metric("hellow !!!  " , " hello 117% " , "your stock is in danger", delta_color ="inverse")
 
 
 with source_code:
@@ -77,7 +77,7 @@ with source_code:
 
 
 
-with modeling:
+with Modeling:
     #modeling.title("Model Architecture 🤖")
     modeling_col1, modeling_col2 = st.columns([0.6,0.4])
     modeling_col1.title("Data Pipeline")
@@ -86,9 +86,7 @@ with modeling:
     modeling_col2.image('imgs/NeuralForecast.png')
 
 
-# get module from : modules vizualization.py  - > st.write(hi())
+with Role:
+    Role.title("Role 🤝")
+    
 
-
-# conn = st.experimental_connection('s3', type=FilesConnection)
-# csv = conn.read("s3://mykafkastockbucket/topics/stock-tutorial/test/simple.csv", input_format="csv")
-# st.write(csv)
