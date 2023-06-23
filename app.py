@@ -16,8 +16,8 @@ def count_outliers(lst):
     mean = np.mean(lst)
     std = np.std(lst)
     
-    lower_bound = mean - 2 * std
-    upper_bound = mean + 2 * std
+    lower_bound = mean - 2.5 * std
+    upper_bound = mean + 2.5 * std
     
     outliers = [x for x in lst if x < lower_bound or x > upper_bound]
     num_outliers = len(outliers)
@@ -92,13 +92,22 @@ if predict_start :
         with st.spinner('Wait for it...'):
             time.sleep(3)
         
-        main_page.header('Reconstruction Error Outlier of autoencoder')
+
+
+        df = get_predicted_data(st.session_state.stock_name, start_date, end_date)
+
+        chart = draw_chart_predict(df)
+
+        main_page.plotly_chart(chart)
+
+
+
 
         df =  get_data(st.session_state.stock_name, start_date, end_date)
 
         column_names = ['open', 'high', 'low', 'close', 'vol', 'value', 'agg_price', 'foreign_rate', 'agency_buy', 'agency_netbuy']
         tmp_df = df[column_names]
-        tail_df = tmp_df[-15:]
+        tail_df = tmp_df[-60:]
 
         time_series = []
         for _, row in tail_df.iterrows():
@@ -119,8 +128,9 @@ if predict_start :
             "time_series" : time_series,
             # "stock_name" : "삼성전자"
         }
+        main_page.header('Reconstruction Error Outlier of autoencoder')
 
-        
+
 
 
         # AutoEncoder 
@@ -146,9 +156,9 @@ if predict_start :
 
         
 
-        if num_outlier > 3: 
+        if num_outlier > 1: 
             main1.metric(f"Reconstruction Error Outlier : {num_outlier}" , "⛈️" , "your stock is in danger" ,delta_color ="inverse")
-        if num_outlier <= 3: 
+        if num_outlier <= 1: 
             main1.metric(f"Reconstruction Error Outlier {num_outlier}" , "☀️" , "your stock is in safe" )
 
         main_page.success('Done!')

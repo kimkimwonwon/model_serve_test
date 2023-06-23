@@ -14,7 +14,7 @@ def get_data(stock_name, start_date, end_date):
 
     '''
     conn = st.experimental_connection('s3', type= FilesConnection)
-    df = conn.read("s3://mykafkastockbucket/batch/kospiTop200_daily_1year.csv", input_format = "csv")
+    df = conn.read("s3://mykafkastockbucket/batch/dailymergedAll.csv", input_format = "csv")
     final_df = df[df['name'] == stock_name]
     final_df['date'] = final_df['date'].astype(str)
     final_df['date'] = pd.to_datetime(final_df['date']).dt.date
@@ -37,7 +37,7 @@ def get_predicted_data(stock_name, start_date, end_date):
     '''
     
     conn = st.experimental_connection('s3', type= FilesConnection)
-    df = conn.read("s3://mykafkastockbucket/batch/dailymergedAll.csv", input_format = "csv")
+    df = conn.read("s3://mykafkastockbucket/batch/320.csv", input_format = "csv")
     final_df = df[df['name'] == stock_name]
     final_df['date'] = final_df['date'].astype(str)
     final_df['date'] = pd.to_datetime(final_df['date']).dt.date
@@ -82,9 +82,9 @@ def draw_chart_predict(df):
     width = 1000, height = 400 , template = 'plotly_dark')
     
     # Add traces for 'pred1' and 'pred2'
-    chart.add_scatter(x=df['date'], y=df['pred1'], mode='lines', name='pred1', line=dict(color='blue'))
-    chart.add_scatter(x=df['date'], y=df['pred2'], mode='lines', name='pred2', line=dict(color='red'))
-    
+    chart.add_scatter(x=df['date'], y=df['NBEATS'], mode='lines', name='NBEATS', line=dict(color='red'))
+    chart.add_scatter(x=df['date'], y=df['NHITS'], mode='lines', name='NHITS', line=dict(color='green'))
+ 
     # Add titles    
     chart.update_xaxes(title='날짜')
     chart.update_yaxes(title='주가')
