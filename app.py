@@ -91,7 +91,8 @@ if predict_start :
     if st.  session_state.stock_name != '':
         with st.spinner('Wait for it...'):
             time.sleep(3)
-        main_page.success('Done!')
+        
+        main_page.header('Reconstruction Error Outlier of autoencoder')
 
         df =  get_data(st.session_state.stock_name, start_date, end_date)
 
@@ -119,6 +120,8 @@ if predict_start :
             # "stock_name" : "삼성전자"
         }
 
+        
+
 
         # AutoEncoder 
         URL =  'http://localhost:8080/2015-03-31/functions/function/invocations'
@@ -133,19 +136,25 @@ if predict_start :
         fig = px.histogram(scaled_prediction_df, x='value', nbins=20)
 
         fig.update_layout(
-            title="Standardized Reconstructed Error Histogram",
+            title="Standardized Reconstruction Error Histogram",
             xaxis_title="Value",
             yaxis_title="Frequency",
             bargap=0.1
-
         )
 
         main_page.plotly_chart(fig)
-        main_page.write(f"Number of outliers: {num_outlier}")
 
+        
 
-        main1.metric("hi" , f" hello 117% " , "your stock is in danger" )
-        main2.metric("hellow !!!  " , " hello 117% " , "your stock is in danger", delta_color ="inverse")
+        if num_outlier > 3: 
+            main1.metric(f"Reconstruction Error Outlier : {num_outlier}" , "⛈️" , "your stock is in danger" ,delta_color ="inverse")
+        if num_outlier <= 3: 
+            main1.metric(f"Reconstruction Error Outlier {num_outlier}" , "☀️" , "your stock is in safe" )
+
+        main_page.success('Done!')
+    else:
+        main_page.error('Please Search Stock First!')
+
 
 
 with source_code:
